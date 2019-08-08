@@ -1,12 +1,15 @@
-import { configureStore } from 'redux-starter-kit';
+import { configureStore, getDefaultMiddleware } from 'redux-starter-kit';
 import { combineReducers } from 'redux';
-import queue from './Queue/reducer'
+import queue from './Queue/reducer';
 
 const reducer = combineReducers({
-    queue
+  queue
 });
 
+const middleware = [...getDefaultMiddleware()];
+
 export default configureStore({
-    reducer,
-    devTools: process.env.NODE_ENV !== 'production'
+  reducer,
+  middleware,
+  devTools: process.env.NODE_ENV !== 'production'
 });

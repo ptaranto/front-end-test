@@ -1,21 +1,23 @@
 import React, { Component } from 'react';
-import base64 from 'base-64';
+import { connect } from 'react-redux';
 import Customer from './components/Customer';
 import Label from './components/Label';
 import Input from './components/Input';
+import { getTodaysCustomers } from './selector';
+import { fetchTodaysQueue, setFilter } from './actions';
 
-export default class extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      customers: [],
-      filter: ''
-    };
-  }
+const mapStateToProps = (state, ownProps) => ({
+  customers: getTodaysCustomers(state)
+});
 
+const mapDispatchToProps = dispatch => ({
+  setFilter: value => dispatch(setFilter(value))
+});
+
+class QueueScreenView extends Component {
   componentDidMount() {
-    this.loadQueue();
-    this.intervalId = window.setInterval(() => this.loadQueue(), 30000);
+    fetchTodaysQueue();
+    this.intervalId = window.setInterval(() => fetchTodaysQueue(), 30000);
   }
 
   componentWillUnmount() {
@@ -25,12 +27,9 @@ export default class extends Component {
   render() {
     let customers = [];
     let customer;
-    for (let i = 0; i < this.state.customers.length; ++i) {
-      customer = this.state.customers[i];
-
-      if (
-        customer.customer.name.toLowerCase().indexOf(this.state.filter) > -1
-      ) {
+    if (this.props.customers) {
+      for (let i = 0; i < this.props.customers.length; ++i) {
+        customer = this.props.customers[i];
         customers.push(
           <div key={customer.id}>
             <Customer customer={customer} />
@@ -44,33 +43,15 @@ export default class extends Component {
         <Label>Filter by customer name:</Label>
         <Input
           type="search"
-          onChange={event => this.filter(event.currentTarget.value)}
+          onChange={event => this.props.setFilter(event.currentTarget.value)}
         />
         {customers}
       </div>
     );
   }
-
-  filter(value) {
-    this.setState({ ...this.state, filter: value.toLowerCase() });
-  }
-
-  loadQueue() {
-    const headers = new Headers();
-    headers.set(
-      'Authorization',
-      'Basic ' + base64.encode('codetest1:codetest100')
-    );
-    fetch('api/queue/gj9fs', {
-      method: 'GET',
-      headers
-    })
-      .then(response => response.json())
-      .then(json => {
-        this.setState({
-          ...this.state,
-          customers: json.queueData.queue.customersToday
-        });
-      });
-  }
 }
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(QueueScreenView);

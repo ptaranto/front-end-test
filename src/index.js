@@ -11,16 +11,17 @@ import './index.css';
 import logo from './logo.svg';
 import Content from './components/Content';
 
-const App = () =>
-    <Provider store={store}>
-        <Container>
-            <Navigation>
-                <Logo src={logo} />
-            </Navigation>
-            <Content>
-            <QueueScreen />
-            </Content>
-        </Container>
-    </Provider>;
+const App = () => (
+  <Provider store={store}>
+    <Container>
+      <Navigation>
+        <Logo src={logo} />
+      </Navigation>
+      <Content>
+        <QueueScreen />
+      </Content>
+    </Container>
+  </Provider>
+);
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));
