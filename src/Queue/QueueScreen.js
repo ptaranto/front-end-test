@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import base64 from 'base-64';
 import Customer from './components/Customer';
+import Label from './components/Label';
+import Input from './components/Input';
 
 export default class extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      customers: []
+      customers: [],
+      filter: ''
     };
   }
 
@@ -33,13 +36,31 @@ export default class extends Component {
     let customer;
     for (let i = 0; i < this.state.customers.length; ++i) {
       customer = this.state.customers[i];
-      customers.push(
-        <div key={customer.id}>
-          <Customer customer={customer} />
-        </div>
-      );
+
+      if (
+        customer.customer.name.toLowerCase().indexOf(this.state.filter) > -1
+      ) {
+        customers.push(
+          <div key={customer.id}>
+            <Customer customer={customer} />
+          </div>
+        );
+      }
     }
 
-    return <div>{customers}</div>;
+    return (
+      <div>
+        <Label>Filter by customer name:</Label>
+        <Input
+          type="search"
+          onChange={event => this.filter(event.currentTarget.value)}
+        />
+        {customers}
+      </div>
+    );
+  }
+
+  filter(value) {
+    this.setState({ ...this.state, filter: value.toLowerCase() });
   }
 }
