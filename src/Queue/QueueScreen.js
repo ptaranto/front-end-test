@@ -14,21 +14,12 @@ export default class extends Component {
   }
 
   componentDidMount() {
-    const headers = new Headers();
-    headers.set(
-      'Authorization',
-      'Basic ' + base64.encode('codetest1:codetest100')
-    );
-    fetch('api/queue/gj9fs', {
-      method: 'GET',
-      headers
-    })
-      .then(response => response.json())
-      .then(json => {
-        this.setState({
-          customers: json.queueData.queue.customersToday
-        });
-      });
+    this.loadQueue();
+    this.intervalId = window.setInterval(() => this.loadQueue(), 30000);
+  }
+
+  componentWillUnmount() {
+    window.clearInterval(this.intervalId);
   }
 
   render() {
@@ -62,5 +53,24 @@ export default class extends Component {
 
   filter(value) {
     this.setState({ ...this.state, filter: value.toLowerCase() });
+  }
+
+  loadQueue() {
+    const headers = new Headers();
+    headers.set(
+      'Authorization',
+      'Basic ' + base64.encode('codetest1:codetest100')
+    );
+    fetch('api/queue/gj9fs', {
+      method: 'GET',
+      headers
+    })
+      .then(response => response.json())
+      .then(json => {
+        this.setState({
+          ...this.state,
+          customers: json.queueData.queue.customersToday
+        });
+      });
   }
 }
